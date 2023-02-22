@@ -1,0 +1,32 @@
+ASSIGNMENT=countWordsSP22
+
+ex=~/$ASSIGNMENT
+
+cd $LIB/public/RA_Spring2022/RA3
+
+[ ! -e $ex ] && echo Cannot find the program, please build it! && exit 1
+
+ofile=`mktemp`
+
+cases=("noarg" "cantopen" "empty" "allspaces" "numsonly" "namesonly" "allwords")
+flags=("" "myfile" "empty" "allspaces" "wints" "wnames" "wintsnames")
+
+for i in 0 1 2 3 4 5 6;
+do
+	score=0
+    echo RUNNING ${flags[i]}
+    eval $LIB/public/wrapcase.pl -- "bash -c \"$ex ${flags[$i]} 2>&1\"" | tee $ofile
+
+    ## for setup ## cp $ofile files$i.correct
+
+    diff $ofile ${cases[$i]}.correct
+
+    [ $? -eq 0 ] && score=1
+
+    echo RESULT: ${cases[i]}  "[ " $score " / 1 ]"
+    echo "-----------------------------------------------------"
+
+    rm $ofile
+done
+
+exit $score
